@@ -1,3 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.fft-li-color {
+    color: theme('colors.fft-li');
+}
