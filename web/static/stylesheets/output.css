@@ -554,18 +554,49 @@ video {
   --tw-contain-style:  ;
 }
 
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
+.m-8 {
+  margin: 2rem;
 }
 
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
+.ml-4 {
+  margin-left: 1rem;
 }
 
-.text-5xl {
-  font-size: 3rem;
+.ml-6 {
+  margin-left: 1.5rem;
+}
+
+.w-screen {
+  width: 100vw;
+}
+
+.list-decimal {
+  list-style-type: decimal;
+}
+
+.list-disc {
+  list-style-type: disc;
+}
+
+.bg-fft-bg {
+  --tw-bg-opacity: 1;
+  background-color: rgb(57 54 61 / var(--tw-bg-opacity));
+}
+
+.text-center {
+  text-align: center;
+}
+
+.font-normal-text {
+  font-family: Maitree;
+}
+
+.font-serif {
+  font-family: "Gilda Display";
+}
+
+.text-7xl {
+  font-size: 4.5rem;
   line-height: 1;
 }
 
@@ -573,16 +604,34 @@ video {
   font-weight: 700;
 }
 
-.text-purple-300 {
-  --tw-text-opacity: 1;
-  color: rgb(216 180 254 / var(--tw-text-opacity));
+.italic {
+  font-style: italic;
 }
 
-.text-red-600 {
-  --tw-text-opacity: 1;
-  color: rgb(220 38 38 / var(--tw-text-opacity));
+.not-italic {
+  font-style: normal;
 }
 
-.underline {
-  text-decoration-line: underline;
+.text-fft-li {
+  --tw-text-opacity: 1;
+  color: rgb(149 118 76 / var(--tw-text-opacity));
+}
+
+.text-fft-li-num {
+  --tw-text-opacity: 1;
+  color: rgb(224 199 165 / var(--tw-text-opacity));
+}
+
+.text-fft-r-name {
+  --tw-text-opacity: 1;
+  color: rgb(224 198 220 / var(--tw-text-opacity));
+}
+
+.text-fft-txt {
+  --tw-text-opacity: 1;
+  color: rgb(255 252 249 / var(--tw-text-opacity));
+}
+
+.fft-li-color {
+  color: #95764c;
 }

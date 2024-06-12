@@ -1,5 +1,58 @@
-{{define "title"}}A templated page{{end}}
+{{define "title"}}Food for Thought{{end}}
 
-{{define "body"}}
-<h1 class="text-5xl font-bold underline text-purple-300">Hello from a templated page again</h1>
+{{define "recipe"}}
+    <div class="font-serif text-7xl text-fft-r-name m-8 text-center w-screen">{{.EnglishName}}</div>
+    <div>
+        <p class="font-bold font-normal-text text-fft-txt">Ingredients</p>
+    </div>
+    {{range .Components}}
+        <ul class="font-normal-text ml-4">
+            <ul class="italic list-disc text-fft-txt ml-4">
+                {{.Name}}
+                <ul class="not-italic text-fft-txt ml-4">
+                    {{range .IngredientSpecifications}}
+                        <li><input type="checkbox">
+                            {{if .AmountQuantity}}
+                                {{.AmountQuantity}}
+                            {{end}}
+                            {{if .PreparationQuantity}}
+                                {{.PreparationQuantity}}
+                            {{end}}
+                            {{if .AmountMass}}
+                            {{.AmountMass}}
+                            {{end}}
+                            {{if .PreparationLength}}
+                                {{.PreparationLength}}
+                            {{end}}
+                            {{if .PreparationType}}
+                                {{.PreparationType}}
+                            {{end}}
+                            {{.Ingredient.Name}} <!-- TODO: update to include rest of Ingredient struct fields -->
+                            {{if .Note}}
+                                ({{.Note}})
+                            {{end}}
+                        </li>
+                    {{end}}
+                </ul>
+            </ul>
+        </ul>
+    {{end}}
+    <div>
+        <p class="font-bold font-normal-text text-fft-txt">Instructions</p>
+    </div>
+    {{range .Instructions}}
+        <ul class="font-normal-text ml-4">
+            <ul class="italic text-fft-txt list-disc ml-4">
+                {{if .Part}}
+                    {{.Part}}
+                {{end}}
+                <ul class="list-decimal text-fft-txt not-italic ml-4">
+                        {{range .Steps}}
+                            <!-- TODO: format based on IsParallel -->
+                            <li class="ml-4">{{.Action.Message}}</li>
+                        {{end}}
+                </ul>
+            </ul>
+        </ul>
+    {{end}}
 {{end}}
