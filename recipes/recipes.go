@@ -3,16 +3,38 @@ package recipes
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
+	"time"
 )
 
-func TodaysRecipe(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "test")
-	// serve static file from frontend folder
+type Config struct {
+	Storage Storer
 }
 
-func AddRecipe(r Recipe) {
-	// insert into db
+type ScheduleConfig struct {
+	TickerDuration time.Duration
+	DailyRecipe    *Recipe // represents a cached version of the current day's recipe
+	NextRecipe     *Recipe // represents a cached version of the next day's recipe to be updated/displayed by the scheduler
+}
+
+// ScheduleDailyRecipe is a job scheduler that updates the daily recipe based on a configured condition that is checked
+// periodically by a configured duration.
+func (sc *ScheduleConfig) ScheduleDailyRecipe() {
+	done := make(chan bool)
+	ticker := time.NewTicker(sc.TickerDuration) // TODO: pull this from config, update param list
+	defer ticker.Stop()
+
+	var t time.Time
+	for {
+		select {
+		case <-done:
+			panic("uhoh") // TODO: handle it! this is an error case only
+		case t = <-ticker.C:
+			if t.Hour() == 0 { // TODO: update this to reflect config condition. currently checks at midnight
+				fmt.Println("<< okay...updating recipe")
+				sc.DailyRecipe = sc.NextRecipe
+			}
+		}
+	}
 }
 
 // UnitLength are units of length, e.g. inches, centimeters, etc.
@@ -26,14 +48,6 @@ const (
 // UnitMass are units of mass/volume, e.g. grams, cups, etc.
 type UnitMass int
 
-func (um UnitMass) String() string {
-	if s, ok := UnitMassToString[um]; ok {
-		return s
-	}
-	// TODO: handle it!
-	panic("uhoh")
-}
-
 const (
 	Whole UnitMass = iota
 	Grams
@@ -44,6 +58,14 @@ var UnitMassToString = map[UnitMass]string{
 	Whole:       "whole",
 	Grams:       "g",
 	Milliliters: "ml",
+}
+
+func (um UnitMass) String() string {
+	if s, ok := UnitMassToString[um]; ok {
+		return s
+	}
+	// TODO: handle it!
+	panic("uhoh")
 }
 
 type SourceCategory int
