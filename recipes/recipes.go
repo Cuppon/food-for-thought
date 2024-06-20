@@ -18,10 +18,17 @@ type ScheduleConfig struct {
 
 // ScheduleDailyRecipe is a job scheduler that updates the daily recipe based on a configured condition that is checked
 // periodically by a configured duration.
-func (sc *ScheduleConfig) ScheduleDailyRecipe() {
+func (sc *ScheduleConfig) ScheduleDailyRecipe(conf Config) {
 	done := make(chan bool)
 	ticker := time.NewTicker(sc.TickerDuration) // TODO: pull this from config, update param list
 	defer ticker.Stop()
+
+	// TODO: remove after done testing
+	var err error
+	*sc.DailyRecipe, err = conf.Storage.GetRecipe(1)
+	if err != nil {
+		panic("uhoh")
+	}
 
 	var t time.Time
 	for {

@@ -562,10 +562,6 @@ video {
   margin-left: 1rem;
 }
 
-.ml-6 {
-  margin-left: 1.5rem;
-}
-
 .w-screen {
   width: 100vw;
 }
@@ -610,16 +606,6 @@ video {
 
 .not-italic {
   font-style: normal;
-}
-
-.text-fft-li {
-  --tw-text-opacity: 1;
-  color: rgb(149 118 76 / var(--tw-text-opacity));
-}
-
-.text-fft-li-num {
-  --tw-text-opacity: 1;
-  color: rgb(224 199 165 / var(--tw-text-opacity));
 }
 
 .text-fft-r-name {
