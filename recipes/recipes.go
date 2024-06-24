@@ -6,26 +6,26 @@ import (
 	"time"
 )
 
-type Config struct {
-	Storage Storer
-}
-
-type ScheduleConfig struct {
+type RecipeConfig struct {
 	TickerDuration time.Duration
 	DailyRecipe    *Recipe // represents a cached version of the current day's recipe
 	NextRecipe     *Recipe // represents a cached version of the next day's recipe to be updated/displayed by the scheduler
 }
 
+type AppConfig struct {
+	Storage Storer
+}
+
 // ScheduleDailyRecipe is a job scheduler that updates the daily recipe based on a configured condition that is checked
 // periodically by a configured duration.
-func (sc *ScheduleConfig) ScheduleDailyRecipe(conf Config) {
+func (rc *RecipeConfig) ScheduleDailyRecipe(appConfig AppConfig) {
 	done := make(chan bool)
-	ticker := time.NewTicker(sc.TickerDuration) // TODO: pull this from config, update param list
+	ticker := time.NewTicker(rc.TickerDuration) // TODO: pull this from config, update param list
 	defer ticker.Stop()
 
 	// TODO: remove after done testing
 	var err error
-	*sc.DailyRecipe, err = conf.Storage.GetRecipe(1)
+	*rc.DailyRecipe, err = appConfig.Storage.GetRecipe(1)
 	if err != nil {
 		panic("uhoh")
 	}
@@ -38,7 +38,7 @@ func (sc *ScheduleConfig) ScheduleDailyRecipe(conf Config) {
 		case t = <-ticker.C:
 			if t.Hour() == 0 { // TODO: update this to reflect config condition. currently checks at midnight
 				fmt.Println("<< okay...updating recipe")
-				sc.DailyRecipe = sc.NextRecipe
+				rc.DailyRecipe = rc.NextRecipe
 			}
 		}
 	}
