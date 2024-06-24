@@ -19,19 +19,19 @@ func main() {
 		panic(err) // TODO: handle it!
 	}
 
-	appConf := recipes.Config{
+	appConf := recipes.AppConfig{
 		Storage: &recipes.PG{Conn: db},
 	}
 	fmt.Println(appConf) // TODO: actually use this via injection to endpoint to set next recipe
 
-	scheduleConf := &recipes.ScheduleConfig{
+	recipeConf := &recipes.RecipeConfig{
 		TickerDuration: time.Hour,         // TODO: pull this from config file
 		DailyRecipe:    &recipes.Recipe{}, // TODO: update with an actual recipe
 		NextRecipe:     &recipes.Recipe{}, // TODO: to be updated via endpoint
 	}
 
 	go func() {
-		scheduleConf.ScheduleDailyRecipe(appConf)
+		recipeConf.ScheduleDailyRecipe(appConf)
 	}()
 
 	// TODO: pull this from config file
@@ -40,7 +40,10 @@ func main() {
 		StaticPath: "web/static",
 	}
 
-	srv := webserver.NewServer(webserver.StaticFilesHandler(templateConf.StaticPath), webserver.TemplateHandler(templateConf, scheduleConf.DailyRecipe))
+	srv := webserver.NewServer(
+		webserver.StaticFilesHandler(templateConf.StaticPath),
+		webserver.TemplateHandler(templateConf, recipeConf.DailyRecipe),
+	)
 	httpServer := &http.Server{
 		Handler: srv,
 	}
