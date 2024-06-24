@@ -25,9 +25,9 @@ func main() {
 	fmt.Println(appConf) // TODO: actually use this via injection to endpoint to set next recipe
 
 	recipeConf := &recipes.RecipeConfig{
-		TickerDuration: time.Hour,         // TODO: pull this from config file
-		DailyRecipe:    &recipes.Recipe{}, // TODO: update with an actual recipe
-		NextRecipe:     &recipes.Recipe{}, // TODO: to be updated via endpoint
+		TickerDuration: time.Hour,        // TODO: pull this from config file
+		DailyRecipe:    recipes.Recipe{}, // TODO: update with an actual recipe
+		NextRecipe:     recipes.Recipe{}, // TODO: to be updated via endpoint
 	}
 
 	go func() {
@@ -42,7 +42,8 @@ func main() {
 
 	srv := webserver.NewServer(
 		webserver.StaticFilesHandler(templateConf.StaticPath),
-		webserver.TemplateHandler(templateConf, recipeConf.DailyRecipe),
+		webserver.TemplateHandler(templateConf, recipeConf),
+		webserver.SetNextRecipeHandler(recipeConf),
 	)
 	httpServer := &http.Server{
 		Handler: srv,

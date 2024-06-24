@@ -8,8 +8,8 @@ import (
 
 type RecipeConfig struct {
 	TickerDuration time.Duration
-	DailyRecipe    *Recipe // represents a cached version of the current day's recipe
-	NextRecipe     *Recipe // represents a cached version of the next day's recipe to be updated/displayed by the scheduler
+	DailyRecipe    Recipe // represents a cached version of the current day's recipe
+	NextRecipe     Recipe // represents a cached version of the next day's recipe to be updated/displayed by the scheduler
 }
 
 type AppConfig struct {
@@ -25,7 +25,7 @@ func (rc *RecipeConfig) ScheduleDailyRecipe(appConfig AppConfig) {
 
 	// TODO: remove after done testing
 	var err error
-	*rc.DailyRecipe, err = appConfig.Storage.GetRecipe(1)
+	rc.DailyRecipe, err = appConfig.Storage.GetRecipe(1)
 	if err != nil {
 		panic("uhoh")
 	}
@@ -42,6 +42,10 @@ func (rc *RecipeConfig) ScheduleDailyRecipe(appConfig AppConfig) {
 			}
 		}
 	}
+}
+
+func (rc *RecipeConfig) SetNextRecipe(nextRecipe Recipe) {
+	rc.NextRecipe = nextRecipe
 }
 
 // UnitLength are units of length, e.g. inches, centimeters, etc.

@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -10,6 +11,24 @@ import (
 
 	"github.com/Cuppon/foodpls/recipes"
 )
+
+func SetNextRecipeHandler(recipeConfig *recipes.RecipeConfig) Route {
+	return func(mux *http.ServeMux) {
+		endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			var nextRecipe recipes.Recipe
+			decoder := json.NewDecoder(r.Body)
+			if err := decoder.Decode(&nextRecipe); err != nil {
+				panic(err) // TODO: handle it!
+			}
+
+			recipeConfig.SetNextRecipe(nextRecipe)
+		})
+
+		endpoint = AddMiddleware(endpoint, ValidateJSONMiddleware)
+
+		mux.Handle("/update-next-recipe", endpoint)
+	}
+}
 
 func StaticFilesHandler(staticFilesPath string) Route {
 	return func(mux *http.ServeMux) {
@@ -24,14 +43,14 @@ type TemplateConfig struct {
 	StaticPath string
 }
 
-func TemplateHandler(templateConfig TemplateConfig, recipe *recipes.Recipe) Route {
+func TemplateHandler(templateConfig TemplateConfig, recipeConfig *recipes.RecipeConfig) Route {
 	return func(mux *http.ServeMux) {
 		// TODO: this will eventually be replaced with cache-related config, and serveTemplate will pull from a cache
-		mux.HandleFunc("/", serveTemplate(templateConfig, recipe))
+		mux.HandleFunc("/", serveTemplate(templateConfig, recipeConfig))
 	}
 }
 
-func serveTemplate(tc TemplateConfig, recipe *recipes.Recipe) http.HandlerFunc {
+func serveTemplate(tc TemplateConfig, rc *recipes.RecipeConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if filepath.Clean(r.URL.Path) != tc.HomePage {
 			log.Println("Attempted access to non-home page: " + r.URL.Path) // TODO: log where people are making requests to
@@ -64,7 +83,7 @@ func serveTemplate(tc TemplateConfig, recipe *recipes.Recipe) http.HandlerFunc {
 			return
 		}
 
-		err = tmpl.ExecuteTemplate(w, "layout", recipe)
+		err = tmpl.ExecuteTemplate(w, "layout", rc.DailyRecipe)
 		if err != nil {
 			log.Println("Could not execute template: ", err.Error())
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
