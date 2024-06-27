@@ -12,6 +12,10 @@ import (
 	"github.com/Cuppon/foodpls/recipes"
 )
 
+func RedirectToHTTPS(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+}
+
 func SetNextRecipeHandler(recipeConfig *recipes.RecipeConfig) Route {
 	return func(mux *http.ServeMux) {
 		endpoint := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
