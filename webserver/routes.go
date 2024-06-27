@@ -24,7 +24,7 @@ func SetNextRecipeHandler(recipeConfig *recipes.RecipeConfig) Route {
 			recipeConfig.SetNextRecipe(nextRecipe)
 		})
 
-		endpoint = AddMiddleware(endpoint, ValidateJSONMiddleware)
+		endpoint = AddMiddleware(endpoint, AuthorizeMiddleware, ValidateJSONMiddleware)
 
 		mux.Handle("/update-next-recipe", endpoint)
 	}

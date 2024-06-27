@@ -45,10 +45,10 @@ func main() {
 		webserver.TemplateHandler(templateConf, recipeConf),
 		webserver.SetNextRecipeHandler(recipeConf),
 	)
-	httpServer := &http.Server{
+	httpsServer := &http.Server{
 		Handler: srv,
 	}
-	if err = httpServer.ListenAndServe(); err != nil {
+	if err = httpsServer.ListenAndServeTLS("server.crt", "server.key"); err != nil {
 		log.Fatal(err) // TODO: hook up proper logging
 	}
 }
