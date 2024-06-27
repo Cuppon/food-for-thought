@@ -34,12 +34,19 @@ func main() {
 		recipeConf.ScheduleDailyRecipe(appConf)
 	}()
 
+	go func() {
+		// TODO: update address to pull from config
+		err := http.ListenAndServe(":80", http.HandlerFunc(webserver.RedirectToHTTPS))
+		if err != nil {
+			log.Fatal(err) // TODO: handle it!
+		}
+	}()
+
 	// TODO: pull this from config file
 	templateConf := webserver.TemplateConfig{
 		HomePage:   "/index.html",
 		StaticPath: "web/static",
 	}
-
 	srv := webserver.NewServer(
 		webserver.StaticFilesHandler(templateConf.StaticPath),
 		webserver.TemplateHandler(templateConf, recipeConf),
