@@ -1,0 +1,44 @@
+{{define "title"}}Food for Thought Add Recipe{{end}}
+
+{{define "content"}}
+    <script src="/serveable/scripts/main.js"></script>
+    <script src="/serveable/scripts/components.js" type="module"></script>
+    <ul style="border-right: 0.1em solid #595959; height: 100%; position: fixed; width: 10%;">
+        <li class="content-center h-10 pl-4" style="border-bottom: 0.1em solid #595959">Food for Thought</li>
+        <li class="content-center h-10 hover:bg-fuchsia-100 pl-4"><a class="active" href="#today">Today's Recipe</a></li>
+        <li class="content-center h-10 hover:bg-fuchsia-100 pl-4"><a href="#add">Add Recipe</a></li>
+        <li class="content-center h-10 hover:bg-fuchsia-100 pl-4"><a href="#update">Update Recipe</a></li>
+    </ul>
+
+    <div class="container" style="margin-left:10%;">
+        <form id="myform" action="/some-endpoint" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div style="border-right: 0.1em solid #595959;">
+                <h2 class="text-lg col-span-1 text-center my-4">Recipe</h2>
+                <text-input input-name="english_name" label-text="English Name"></text-input>
+                <component-toggler id="native_name">
+                    <text-input input-name="native_name" label-text="Native Name">
+                    </text-input>
+                </component-toggler>
+                <component-toggler id="attribution">
+                    <text-input input-name="attribution" label-text="Attribution">
+                    </text-input>
+                </component-toggler>
+                <component-toggler id="cuisine">
+                    <text-input input-name="cuisine" label-text="Cuisine">
+                    </text-input>
+                </component-toggler>
+                <component-toggler id="emojis">
+                    <text-input input-name="emojis" label-text="Emojis">
+                    </text-input>
+                </component-toggler>
+                <component-toggler id="notes">
+                    <text-input input-name="notes" label-text="Notes">
+                    </text-input>
+                </component-toggler>
+                <button form="myform" id="mybtn" type="button">submit</button>
+            </div>
+            <div>stuff2</div>
+            <div>stuff3</div>
+        </form>
+    </div>
+{{end}}
