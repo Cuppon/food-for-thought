@@ -23,9 +23,9 @@ class CustomBase extends HTMLElement {
 
 const textInputTemplate = document.createElement('template');
 textInputTemplate.innerHTML = `
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center">
         <label class="text-gray-50"></label>
-        <input type="text" required class="ml-2 w-15">
+        <input type="text" required class="ml-2">
     </div>
 `;
 
@@ -51,6 +51,7 @@ class TextInput extends CustomBase {
         this._input = this._shadowRoot.querySelector('input');
         this._input.id = inputName;
         this._input.name = inputName;
+        this.id = inputName;
 
         const labelText = this.getAttribute('label-text');
         const label = this._shadowRoot.querySelector('label');
@@ -66,9 +67,9 @@ class TextInput extends CustomBase {
 
 const togglerTemplate = document.createElement('template');
 togglerTemplate.innerHTML = `
-    <div class="flex flex-row items-center ml-4">
-        <button class="rounded-full w-12 h-12 text-2xl focus:outline-none">+</button>
-        <div id="content" class="ml-4 flex-1 items-center space-x-4">
+    <div class="flex mt-4">
+        <button class="flex-shrink-0 rounded-full w-9 h-9 border-2 border-gray-600 text-sm text-gray-100 hover:bg-gray-600">+</button>
+        <div class="w-full ps-2 pt-1">
             <slot></slot>
         </div>
     </div>
@@ -77,6 +78,8 @@ togglerTemplate.innerHTML = `
 class ComponentToggler extends HTMLElement {
     static observedAttributes = ['show-initially'];
     _shadowRoot;
+    _children;
+    _definedChildren = [];
 
     constructor() {
         super();
@@ -95,12 +98,14 @@ class ComponentToggler extends HTMLElement {
         button.addEventListener('click', this.#toggleButtonDisplay);
         button.addEventListener('click', this.#toggleSlotVisibility.bind(this));
 
+        this._children = this._shadowRoot.querySelector('slot').assignedElements();
+
         // hide slots by default unless attribute exists to specify otherwise
         const showInitially = this.hasAttribute('show-initially');
         if (!showInitially) {
             button.textContent = '+';
 
-            this.#toggleSlotVisibility(null);
+            this.#toggleSlotVisibility();
         } else {
             button.textContent = '-';
         }
@@ -120,19 +125,28 @@ class ComponentToggler extends HTMLElement {
         ev.target.textContent = show ? '-' : '+'
     }
 
-    #toggleSlotVisibility(ev) {
-        // ! - due to lifecycle and DOM order, moving this into connectedCallback(), would
-        // result in 'children' being undefined
-        const children = this._shadowRoot.querySelector('slot').assignedElements();
+    // TODO: need to make sure to check whether browser supports slots
+    async #toggleSlotVisibility() {
+        for(const c of this._children) {
+            const tag = c.tagName.toLowerCase();
+            if (!this._definedChildren.includes(tag)) {
+                this._definedChildren.push(tag);
 
-        children.forEach((e) => {
-            if (typeof e.toggleVisibility === 'function') {
-                e.toggleVisibility();
+                await customElements.whenDefined(tag);
+            }
+
+            if (typeof c.toggleVisibility === 'function') {
+                c.toggleVisibility();
             } else {
-                const errMsg = "Missing toggleVisibility() on " + e.name;
+                const errMsg = "Missing toggleVisibility() on " + c.name;
                 throw new Error(errMsg);
             }
-        })
+        }
+    }
+
+    toggleVisibility() {
+        const show = this.style.display === 'none';
+        this.style.display = show ? 'flex' : 'none';
     }
 }
 

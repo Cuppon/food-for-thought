@@ -1,21 +1,33 @@
+import {parseRecipe} from './recipe.js'
+
 const supportsHTML5 = ('content' in document.createElement('template'))
+const endpoint = 'https://127.0.0.1:443/add-recipe';
 
 document.addEventListener('DOMContentLoaded', () => {
-    if(!supportsHTML5) {
+    if (!supportsHTML5) {
         // TODO: tell user they need to use a modern browser
     }
 
-    // TODO: update names
-    const form = document.getElementById("myform");
-    const btn = document.getElementById("mybtn");
+    const form = document.getElementById("recipe_form");
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-    btn.addEventListener('click', () => {
-        // TODO: get all elements within the form that have a shared/common class, indicating
-        // they are a component that has input data associated with them
-        const textInput = form.querySelector('text-input');
-        if(textInput) {
-            let inputVal = textInput.value;
-            console.log("and the value is ", inputVal);
-        }
-    })
-})
+        let recipe = parseRecipe();
+        let json = JSON.stringify(recipe);
+        let r = new Request(endpoint, {
+            method: 'POST',
+            body: json,
+            headers: {
+                'content-type': 'application/json'
+            }
+        });
+
+        fetch(r)
+            .then(r => {
+                // TODO: handle it!
+                if (!r.ok) throw new Error('invalid');
+                console.log(r.text());
+            })
+            .catch(console.warn);
+    });
+});
