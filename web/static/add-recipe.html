@@ -1,0 +1,36 @@
+{{define "title"}}Food for Thought Add Recipe{{end}}
+
+{{define "content"}}
+    <script src="/serveable/scripts/main.js" type="module"></script>
+    <script src="/serveable/scripts/components.js" type="module"></script>
+    <ul class="border-r border-neutral-600 h-full fixed w-[10%]">
+        <li class="border-b-2 border-neutral-600 content-center h-10 pl-4">Food for Thought</li>
+        <li class="content-center h-10 hover:bg-fuchsia-100 pl-4"><a class="active" href="#today">Today's Recipe</a></li>
+        <li class="content-center h-10 hover:bg-fuchsia-100 pl-4"><a href="#add">Add Recipe</a></li>
+        <li class="content-center h-10 hover:bg-fuchsia-100 pl-4"><a href="#update">Update Recipe</a></li>
+    </ul>
+
+    <div class="container ml-[10%]">
+        <form id="recipe_form" class="grid grid-cols-1 md:grid-cols-3 gap-4 pl-4">
+            <div class="border-r border-neutral-600">
+<!--                TODO: update to contain full recipe form -->
+                <h2 class="text-lg col-span-1 text-center my-4">Recipe</h2>
+                <text-input input-name="english_name" label-text="English Name"></text-input>
+                <component-toggler id="ct_native_name">
+                    <text-input input-name="native_name" label-text="Native Name">
+                    </text-input>
+                </component-toggler>
+                <component-toggler id="ct_attribution">
+                    <text-input input-name="attribution" label-text="Attribution">
+                    </text-input>
+                    <component-toggler id="ct_url">
+                        <text-input input-name="url" label-text="Add URL">
+                        </text-input>
+                    </component-toggler>
+                </component-toggler>
+<!--                TODO: update button design -->
+                <button form="recipe_form" id="submit_button">submit</button>
+            </div>
+        </form>
+    </div>
+{{end}}
