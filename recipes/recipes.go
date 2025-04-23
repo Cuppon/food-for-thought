@@ -85,6 +85,7 @@ const (
 	CountryFlag SourceCategory = iota
 	CookBook
 	ChefSite
+	Emoji
 )
 
 // Recipe describes a recipe to be displayed.
@@ -112,8 +113,8 @@ type Component struct {
 
 // Source is any link (path to image, URL, etc) and its description.
 type Source struct {
-	Description string         `db:"description" json:"description"`
-	Location    string         `db:"location" json:"location"` // a path to an image, url, page number, etc.
+	Description string         `db:"description" json:"description"` // a description of the location/category
+	Location    string         `db:"location" json:"location"`       // a UTF-8 character, or path to an image, url, page number, etc.
 	Category    SourceCategory `db:"category" json:"category"`
 }
 

@@ -1,8 +1,10 @@
-// TODO: update to contain full recipe structure
+// TODO: update to contain full recipe structure, and implement nested object logic, e.g. attribution { url: {}}
 const recipeStructure = {
     english_name: "",
     native_name: "",
-    url: ""
+    attribution: "",
+    url: "",
+    emojis: ""
 }
 
 export function parseRecipe() {
