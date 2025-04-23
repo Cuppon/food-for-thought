@@ -15,21 +15,26 @@
             <div class="border-r border-neutral-600">
 <!--                TODO: update to contain full recipe form -->
                 <h2 class="text-lg col-span-1 text-center my-4">Recipe</h2>
-                <text-input input-name="english_name" label-text="English Name"></text-input>
-                <component-toggler id="ct_native_name">
-                    <text-input input-name="native_name" label-text="Native Name">
-                    </text-input>
+                <text-input id="english_name" label-text="English Name"></text-input>
+                <component-toggler>
+                    <text-input id="native_name" label-text="Native Name"></text-input>
                 </component-toggler>
-                <component-toggler id="ct_attribution">
-                    <text-input input-name="attribution" label-text="Attribution">
-                    </text-input>
-                    <component-toggler id="ct_url">
-                        <text-input input-name="url" label-text="Add URL">
-                        </text-input>
+                <component-toggler>
+                    <text-input id="attribution" label-text="Attribution"></text-input>
+                    <component-toggler>
+                        <text-input id="url" label-text="Add URL"></text-input>
                     </component-toggler>
                 </component-toggler>
+                <component-toggler>
+                    <container-group id="emojis" label-text="Emojis">
+                        <checkbox-item emoji-code="&#129379" id="cb_single_pot" label-text="Single Pot Cookable"></checkbox-item>
+                        <checkbox-item emoji-code="&#x23F1" id="cb_quick" label-text="Quick Prep + Cook Time"></checkbox-item>
+                        <checkbox-item emoji-code="&#128298" id="cb_little_prep" label-text="Little Prep Involved"></checkbox-item>
+                        <checkbox-item emoji-code="&#128681" id="cb_tooling" label-text="Extra Tooling"></checkbox-item>
+                    </container-group>
+                </component-toggler>
 <!--                TODO: update button design -->
-                <button form="recipe_form" id="submit_button">submit</button>
+                <button form="recipe_form" id="submit_button" type="submit">submit</button>
             </div>
         </form>
     </div>

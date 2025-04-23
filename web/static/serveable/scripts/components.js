@@ -8,8 +8,10 @@ const cssRules = (() => {
     }
     return cssTxt;
 })();
+// TODO: look into whether shadowRoot detection necessary (check adoptedStyleSheets in Document.prototype)
 const shadowSheet = new CSSStyleSheet();
 shadowSheet.replaceSync(cssRules);
+const LABEL_TEXT = 'label-text';
 
 class CustomBase extends HTMLElement {
     constructor() {
@@ -18,6 +20,107 @@ class CustomBase extends HTMLElement {
 
     get value() {
         throw new Error("Child class must implement the 'value' property.")
+    }
+}
+
+// TODO: look into ARIA attributes
+const checkboxItemTemplate = document.createElement('template');
+checkboxItemTemplate.innerHTML = `
+    <div class="flex flex-col flex-1 text-center">
+        <div class="flex-1">
+            <p></p>
+        </div>
+        <div class="flex-1 px-4 ">
+            <label class="block text-gray-50 text-xs leading-none"></label>
+        </div>
+        <div class="flex-1">
+            <input type="checkbox">
+        </div>
+    </div>
+`;
+
+class CheckboxItem extends CustomBase {
+    _shadowRoot;
+    _input;
+
+    constructor() {
+        super();
+
+        this._shadowRoot = this.attachShadow({mode:'closed'});
+        let clone = checkboxItemTemplate.content.cloneNode(true);
+        this._shadowRoot.append(clone);
+        this._shadowRoot.adoptedStyleSheets = [shadowSheet];
+    }
+
+    get value() {
+        return this._input.checked;
+    }
+
+    connectedCallback() {
+        this._input = this._shadowRoot.querySelector('input');
+        this._input.name = this.id;
+
+        const labelText = this.getAttribute(LABEL_TEXT);
+        const label = this._shadowRoot.querySelector('label');
+        label.setAttribute('for', this.id);
+        label.textContent = labelText;
+
+        const emojiIcon = this.getAttribute('emoji-code');
+        const p = this._shadowRoot.querySelector('p');
+        p.textContent = emojiIcon;
+    }
+}
+
+const containerGroupTemplate = document.createElement('template');
+containerGroupTemplate.innerHTML = `
+    <legend class="block text-gray-50"></legend>
+    <div class="flex flex-row">
+        <slot></slot>
+    </div>
+    <style>
+        ::slotted(*) { display: flex; flex: 1 1; }
+    </style>
+`;
+
+class ContainerGroup extends CustomBase {
+    _shadowRoot;
+    _legend;
+    _toggleableElement;
+    _children;
+
+    constructor() {
+        super();
+
+        this._shadowRoot = this.attachShadow({mode:'closed'});
+        let clone = containerGroupTemplate.content.cloneNode(true);
+        this._shadowRoot.append(clone);
+        this._shadowRoot.adoptedStyleSheets = [shadowSheet];
+    }
+
+    get value() {
+        if (!this._children) throw new Error(`Can't get ${this.className} value; uninitialized`);
+
+        let children = {};
+        for(const c of this._children) {
+            children[c.id] = c.value;
+        }
+
+        return children;
+    }
+
+    connectedCallback() {
+        this._toggleableElement = this._shadowRoot.querySelector('div');
+
+        this._legend = this._shadowRoot.querySelector('legend')
+        this._legend.setAttribute('for', this.id)
+        this._legend.textContent = this.getAttribute(LABEL_TEXT);
+
+        this._children = this._shadowRoot.querySelector('slot').assignedElements();
+    }
+
+    toggleVisibility() {
+        const show = this._toggleableElement.style.display === 'none';
+        this._toggleableElement.style.display = show ? 'flex' : 'none';
     }
 }
 
@@ -31,7 +134,7 @@ textInputTemplate.innerHTML = `
 
 class TextInput extends CustomBase {
     _shadowRoot;
-    _input;
+    _toggleableElement;
 
     constructor() {
         super();
@@ -43,28 +146,27 @@ class TextInput extends CustomBase {
     }
 
     get value() {
-        return this._input.value;
+        if (!this._toggleableElement) throw new Error(`Can't get ${this.className} value; uninitialized`);
+
+        return this._toggleableElement.value;
     }
 
     connectedCallback() {
-        const inputName = this.getAttribute('input-name');
-        this._input = this._shadowRoot.querySelector('input');
-        this._input.id = inputName;
-        this._input.name = inputName;
-        this.id = inputName;
+        this._toggleableElement = this._shadowRoot.querySelector('input');
+        this._toggleableElement.name = this.id;
 
-        const labelText = this.getAttribute('label-text');
         const label = this._shadowRoot.querySelector('label');
-        label.setAttribute('for', inputName);
-        label.textContent = labelText;
+        label.setAttribute('for', this.id);
+        label.textContent = this.getAttribute(LABEL_TEXT);
     }
 
     toggleVisibility() {
-        const show = this._input.style.display === 'none';
-        this._input.style.display = show ? 'flex' : 'none';
+        const show = this._toggleableElement.style.display === 'none';
+        this._toggleableElement.style.display = show ? 'flex' : 'none';
     }
 }
 
+// TODO: look into ARIA attributes
 const togglerTemplate = document.createElement('template');
 togglerTemplate.innerHTML = `
     <div class="flex mt-4">
@@ -91,10 +193,7 @@ class ComponentToggler extends HTMLElement {
     }
 
     connectedCallback() {
-        const buttonID = this.getAttribute('id');
         const button = this._shadowRoot.querySelector('button');
-        button.id = buttonID;
-
         button.addEventListener('click', this.#toggleButtonDisplay);
         button.addEventListener('click', this.#toggleSlotVisibility.bind(this));
 
@@ -125,7 +224,9 @@ class ComponentToggler extends HTMLElement {
         ev.target.textContent = show ? '-' : '+'
     }
 
-    // TODO: need to make sure to check whether browser supports slots
+    /* TODO: need to make sure to check whether browser supports slots
+     * - double check on toggling ARIA attributes when visibility toggled
+     */
     async #toggleSlotVisibility() {
         for(const c of this._children) {
             const tag = c.tagName.toLowerCase();
@@ -150,5 +251,7 @@ class ComponentToggler extends HTMLElement {
     }
 }
 
+customElements.define('checkbox-item', CheckboxItem);
 customElements.define('text-input', TextInput);
+customElements.define('container-group', ContainerGroup);
 customElements.define('component-toggler', ComponentToggler);
